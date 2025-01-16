@@ -1,0 +1,18 @@
+// https://github.com/GantMan/nsfw_model
+// https://github.com/GantMan/nsfw_model/releases/download/1.2.0/mobilenet_v2_140_224.1.zip
+
+public class MobileNetV2Detector : BaseDetector<float>
+{
+    public MobileNetV2Detector()
+        : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\GantMan\MobileNet_v2\MobileNetV2.onnx"), "self:0", "sequential/prediction/Softmax:0", 224, 224)
+    {
+        _pixelTransformer = x => x / 255;
+    }
+
+    protected override float ModelOutputToDetections(PreprocessedImage preprocessed, TensorBase modelOutput)
+    {
+        //var labels = new string[] { "Drawing", "Hentai", "Neutral", "Porn", "Sexy" }; 
+        var result = (DenseTensor<float>)modelOutput;
+        return result[0, 1] + result[0, 3] + result[0, 4];
+    }
+}

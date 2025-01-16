@@ -1,0 +1,23 @@
+// https://huggingface.co/Falconsai/nsfw_image_detection
+
+//NOTE: This is only trained on actual porn, rather than all forms of NSFW, so it gets mediocre results
+
+public class FalconsaiDetector : BaseDetector<float>
+{
+    public FalconsaiDetector()
+        : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\Falconsai\model.onnx"), "pixel_values", "logits", 224, 224)
+    {
+        _shape = new int[] { 1, 3, _resizeHeight, _resizeWidth };
+        _pixelTransformer = x => (x / 255 - .5f) / .5f;
+        _resizeSampler = KnownResamplers.Triangle;
+        _tensorLayoutChannelFirst = true;
+    }
+
+    protected override float ModelOutputToDetections(PreprocessedImage preprocessed, TensorBase modelOutput)
+    {
+        //var labels = new string[] { "Normal", "NSFW" }; 
+        var result = (DenseTensor<float>)modelOutput;
+        var probabilities = Softmax(result);
+        return probabilities[1];
+    }
+}

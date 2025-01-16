@@ -1,0 +1,20 @@
+// https://github.com/bumble-tech/private-detector
+// https://storage.googleapis.com/private_detector/private_detector_with_frozen.zip
+
+//NOTE: This is specifically trained only for "cyber-flashing" on dating profiles, rather than all forms of NSFW, so it gets mediocre results
+
+public class BumbleDetector : BaseDetector<float>
+{
+    public BumbleDetector()
+        : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\Bumble\bumble.onnx"), "x:0", "Identity:0", 480, 480)
+    {
+        _pixelTransformer = x => (x - 128) / 128;
+        _shape = new int[] { 1, _resizeHeight * _resizeWidth * 3 };
+    }
+
+    protected override float ModelOutputToDetections(PreprocessedImage preprocessed, TensorBase modelOutput)
+    {        
+        var output = (DenseTensor<Float16>)modelOutput;
+        return (float)output[0, 0];
+    }
+}

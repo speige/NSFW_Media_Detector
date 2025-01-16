@@ -1,0 +1,19 @@
+// https://huggingface.co/Marqo/nsfw-image-detection-384
+
+public class MarqoDetector : BaseDetector<float>
+{
+    public MarqoDetector()
+        : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\Marqo\Marqo.onnx"), "pixel_values", "logits", 384, 384)
+    {
+        _shape = new int[] { 1, 3, _resizeHeight, _resizeWidth };
+        _pixelTransformer = x => ((x / 255 - .5f) / .5f);
+        _tensorLayoutChannelFirst = true;
+    }
+
+    protected override float ModelOutputToDetections(PreprocessedImage preprocessed, TensorBase modelOutput)
+    {
+        var result = (DenseTensor<float>)modelOutput;
+        var probabilities = Softmax(result);
+        return probabilities[0];
+    }
+}

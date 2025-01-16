@@ -1,0 +1,22 @@
+// https://huggingface.co/TostAI/nsfw-image-detection-large
+
+public class TostAIDetector : BaseDetector<float>
+{
+    public TostAIDetector()
+        : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\TostAI\TostAI.onnx"), "pixel_values", "logits", 512, 512)
+    {
+        _shape = new int[] { 1, 3, _resizeHeight, _resizeWidth };
+        _pixelTransformer_R = x => ((x / 255 - .485f) / .229f);
+        _pixelTransformer_G = x => ((x / 255 - .456f) / .224f);
+        _pixelTransformer_B = x => ((x / 255 - .406f) / .225f);
+        _tensorLayoutChannelFirst = true;
+    }
+
+    protected override float ModelOutputToDetections(PreprocessedImage preprocessed, TensorBase modelOutput)
+    {
+        //var labels = new string[] { "SFW", "NSFW_1", "NSFW_2" }; 
+        var result = (DenseTensor<float>)modelOutput;
+        var probabilities = Softmax(result);
+        return probabilities[1] + probabilities[2];
+    }
+}

@@ -1,0 +1,18 @@
+// https://github.com/GantMan/nsfw_model
+// https://s3.amazonaws.com/ir_public/ai/nsfw_models/nsfw.299x299.pb
+
+public class InceptionV3Detector : BaseDetector<float>
+{
+    public InceptionV3Detector()
+        : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\GantMan\Inception_V3\nsfw.299x299.onnx"), "input_1:0", "dense_3/Softmax:0", 299, 299)
+    {
+        _pixelTransformer = x => x / 255;
+    }
+
+    protected override float ModelOutputToDetections(PreprocessedImage preprocessed, TensorBase modelOutput)
+    {
+        //var labels = new string[] { "Drawing", "Hentai", "Neutral", "Porn", "Sexy" }; 
+        var result = (DenseTensor<float>)modelOutput;
+        return result[0, 1] + result[0, 3] + result[0, 4];
+    }
+}
