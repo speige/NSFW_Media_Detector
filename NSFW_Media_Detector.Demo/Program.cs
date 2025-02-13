@@ -24,7 +24,7 @@ namespace NSFW_Media_Detector.Demo
                     var result = detector.CalcNSFWProbability(bytes);
                     stopWatch.Stop();
                     Console.WriteLine("NSFW Probability: " + result);
-                    Console.WriteLine("Milliseconds to detect: " + TimeSpan.FromMilliseconds(stopWatch.ElapsedMilliseconds).TotalSeconds);
+                    Console.WriteLine("Seconds to detect: " + TimeSpan.FromMilliseconds(stopWatch.ElapsedMilliseconds).TotalSeconds);
                 }
             }
             else if (input.EndsWith(".mp4", StringComparison.InvariantCultureIgnoreCase))

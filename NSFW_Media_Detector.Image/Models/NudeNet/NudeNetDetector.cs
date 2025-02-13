@@ -1,7 +1,6 @@
 ﻿using Emgu.CV.Dnn;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace NSFW_Media_Detector.Image.Models.NudeNet
@@ -14,7 +13,8 @@ namespace NSFW_Media_Detector.Image.Models.NudeNet
         protected readonly string[] _labels;
         protected readonly Dictionary<string, float> _labelWeights;
         public NudeNetDetector()
-            : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\NudeNet\640m.onnx"), "images", "output0", 640, 640)
+             : base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\NudeNet\640m.onnx"), "images", "output0", 640, 640)
+            //: base(Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), @"Models\NudeNet\320n.onnx"), "images", "output0", 320, 320) // smaller model (better performance with worse accuracy. best for mobile devices)
         {
             _shape = new int[] { 1, 3, _resizeHeight, _resizeWidth };
             _pixelTransformer = x => x / 255;

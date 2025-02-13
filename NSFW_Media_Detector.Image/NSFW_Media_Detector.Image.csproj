@@ -24,6 +24,9 @@
     <None Update="ffmpeg_binaries\ffprobe.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Models\NudeNet\320n.onnx.0">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Models\NudeNet\640m.onnx.0">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
