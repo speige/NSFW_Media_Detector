@@ -11,7 +11,7 @@ namespace NSFW_Media_Detector.Image
         {
             _weightPerDetector = new Dictionary<INSFWImageDetector, float>()
             {
-                { new NudeNetDetector(), 1.0f },
+                { new CleanScreenDetector(), 1.0f },
             };
 
             var total = _weightPerDetector.Select(x => x.Value).Sum();

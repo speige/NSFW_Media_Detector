@@ -9,10 +9,12 @@ namespace NSFW_Media_Detector.Demo
     {
         static void Main(string[] args)
         {
-            var input = args[0];
+            //var input = args[0];
+            //var input = @"C:\temp\nsfw\images\92681.jpg";
+            var input = @"C:\temp\nsfw\I Now Pronounce Chuck Larry.mp4";
 
             //NOTE: Sometimes while debugging there will be a memory exception due to reading unmanaged memory that has been moved. Pinning/etc wasn't helpful. Hoping that running in release mode without debugger attached will fix it. If not, may need to use a separate process for the analysis so it can be restarted after crashes.
-            if (input.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase))
+            if (input.EndsWith(".jpg", StringComparison.InvariantCultureIgnoreCase) || input.EndsWith(".png", StringComparison.InvariantCultureIgnoreCase))
             {
                 using (var detector = new NSFWDetector_Ensemble())
                 {
@@ -46,7 +48,8 @@ namespace NSFW_Media_Detector.Demo
                         try
                         {
                             var probability = (int)(detector.CalcNSFWProbability(bytes) * 100);
-                            File.WriteAllBytes(Path.Combine(outputPath, $"{counter}_{probability}.jpg"), bytes);
+                            var extension = probability >= 70 ? "jpg_nsfw" : "jpg";
+                            File.WriteAllBytes(Path.Combine(outputPath, $"{counter}_{probability}.{extension}"), bytes);
                         }
                         catch (Exception e)
                         {

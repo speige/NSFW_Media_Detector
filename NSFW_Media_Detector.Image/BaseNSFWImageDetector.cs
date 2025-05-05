@@ -45,6 +45,7 @@ namespace NSFW_Media_Detector.Image
                 GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_ALL,
                 //LogSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_VERBOSE
             };
+            /*
             for (var deviceId = 0; deviceId <= 2; deviceId++)
             {
                 try
@@ -62,6 +63,7 @@ namespace NSFW_Media_Detector.Image
                     Console.WriteLine("Unable to use GPU Acceleration: " + e.Message);
                 }
             }
+            */
             sessionOptions.AppendExecutionProvider_CPU();
 
             _session = new InferenceSession(ReadFileChunked(modelPath), sessionOptions);
@@ -101,10 +103,12 @@ namespace NSFW_Media_Detector.Image
 
         protected class PreprocessedImage : IDisposable
         {
+            public Image<Rgba32> OriginalImage;
             public Image<Rgba32> Image;
             public float[] PixelData;
             public float RatioX;
             public float RatioY;
+            public float Scale;
             public int XPadding;
             public int YPadding;
             public int OriginalWidth;
@@ -122,12 +126,15 @@ namespace NSFW_Media_Detector.Image
         protected PreprocessedImage PreprocessImage(Image<Rgba32> image)
         {
             var result = new PreprocessedImage();
-            result.Image = image.Clone();
-            result.OriginalWidth = result.Image.Width;
-            result.OriginalHeight = result.Image.Height;
-            result.RatioX = (float)_resizeWidth / result.Image.Width;
-            result.RatioY = (float)_resizeHeight / result.Image.Height;
-            result.Image.Mutate(ctx => ctx.Resize(new ResizeOptions() { Mode = _padToMaintainAspectRatio ? ResizeMode.Pad : ResizeMode.Stretch, Size = new Size(_resizeWidth, _resizeHeight), Sampler = _resizeSampler, PadColor = Color.Black }));
+            result.OriginalImage = image;
+            result.OriginalWidth = result.OriginalImage.Width;
+            result.OriginalHeight = result.OriginalImage.Height;
+            result.RatioX = (float)_resizeWidth / result.OriginalWidth;
+            result.RatioY = (float)_resizeHeight / result.OriginalHeight;
+            result.Scale = Math.Min(result.RatioY, result.RatioX);
+            result.Image = image.Clone(ctx => ctx.Resize(new ResizeOptions() { Mode = _padToMaintainAspectRatio ? ResizeMode.Pad : ResizeMode.Stretch, Size = new Size(_resizeWidth, _resizeHeight), Sampler = _resizeSampler, PadColor = Color.Black }));
+            result.XPadding = (int)((_resizeWidth - (result.OriginalWidth * result.Scale)) / 2);
+            result.YPadding = (int)((_resizeHeight - (result.OriginalHeight * result.Scale)) / 2);
             result.PixelData = GetPixelData(result);
             return result;
         }
@@ -213,7 +220,7 @@ namespace NSFW_Media_Detector.Image
             }
         }
 
-        private bool _initialized = false;
+        protected bool _initialized = false;
         public virtual T Detect(Image<Rgba32> image)
         {
             if (!_initialized)

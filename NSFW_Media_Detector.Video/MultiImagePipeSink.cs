@@ -4,8 +4,8 @@ namespace NSFW_Media_Detector.Video
 {
     public class MultiImagePipeSink : IPipeSink
     {
-        private readonly Action<byte[]> _onFrame;
-        private readonly List<byte> _frameBuffer = new List<byte>();
+        protected readonly Action<byte[]> _onFrame;
+        protected readonly List<byte> _frameBuffer = new List<byte>();
 
         public MultiImagePipeSink(Action<byte[]> onFrame)
         {
